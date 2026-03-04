@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Harell Data — GPU Compute</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="s-logo">
+      <div class="s-logo-icon">⬡</div>
+      <div class="s-logo-text"><span>Harell</span> Data</div>
+    </div>
+    <div class="s-nav">
+      <span class="nav-lbl">Compute</span>
+      <div class="nav-item active"><span class="nav-ico">⚡</span>GPU Clusters</div>
+      <div class="nav-item"><span class="nav-ico">🧪</span>Training Jobs</div>
+      <div class="nav-item"><span class="nav-ico">📦</span>Datasets</div>
+      <div class="nav-item"><span class="nav-ico">📈</span>Metrics</div>
+      <span class="nav-lbl">Platform</span>
+      <div class="nav-item"><span class="nav-ico">🔐</span>Access Control</div>
+      <div class="nav-item"><span class="nav-ico">💳</span>Billing</div>
+      <div class="nav-item"><span class="nav-ico">⚙️</span>Settings</div>
+    </div>
+    <div class="s-bottom">
+      <div class="cluster-badge">
+        <div class="cb-label">Active Clusters</div>
+        <div class="cb-row"><span class="cb-name">us-east-1</span><div class="cb-dot green-dot"></div></div>
+        <div class="cb-row"><span class="cb-name">eu-west-2</span><div class="cb-dot green-dot"></div></div>
+        <div class="cb-row"><span class="cb-name">ap-south-1</span><div class="cb-dot yellow-dot"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <span class="tb-title">GPU Compute</span>
+        <span class="tb-sub">· us-east-1 cluster</span>
+      </div>
+      <div class="tb-clock" id="clock">00:00:00</div>
+      <div class="tb-space"></div>
+      <div class="tb-stat">
+        <div><div class="tb-stat-val green">99.98%</div><div class="tb-stat-lbl">Uptime</div></div>
+      </div>
+      <div class="tb-stat">
+        <div><div class="tb-stat-val" id="active-jobs">12</div><div class="tb-stat-lbl">Active Jobs</div></div>
+      </div>
+      <div class="tb-stat">
+        <div>
+          <div class="tb-stat-val accent">$<span id="burn">0.84</span><span class="tb-small">/hr</span></div>
+          <div class="tb-stat-lbl">Burn Rate</div>
+        </div>
+      </div>
+      <button class="tb-btn">+ New Job</button>
+    </div>
+
+    <div class="content">
+
+      <!-- Stat Cards -->
+      <div class="stat-row">
+        <div class="stat-card purple">
+          <div class="sc-label">GPU Nodes</div>
+          <div class="sc-val">32</div>
+          <div class="sc-sub">H100 · 80GB VRAM each</div>
+          <div class="sc-badge up">▲ 4 added this week</div>
+        </div>
+        <div class="stat-card green">
+          <div class="sc-label">Avg GPU Utilization</div>
+          <div class="sc-val" id="avg-util">78%</div>
+          <div class="sc-sub">Across all active nodes</div>
+          <div class="sc-badge up">↑ Optimal range</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="sc-label">Total VRAM</div>
+          <div class="sc-val">2.56<span class="sc-unit">TB</span></div>
+          <div class="sc-sub"><span id="vram-used">1.98</span>TB allocated</div>
+          <div class="sc-badge warn">77% used</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="sc-label">Monthly Compute</div>
+          <div class="sc-val">$42.8<span class="sc-unit">K</span></div>
+          <div class="sc-sub">On track · 18d remaining</div>
+          <div class="sc-badge up">↓ 12% vs last month</div>
+        </div>
+      </div>
+
+      <!-- GPU Node Grid -->
+      <div class="card">
+        <div class="card-title">GPU Nodes — H100 Cluster <span class="card-action">View all 32 →</span></div>
+        <div class="gpu-grid" id="gpuGrid"></div>
+      </div>
+
+      <!-- Mid Row -->
+      <div class="mid-row">
+
+        <!-- Job Queue -->
+        <div class="card">
+          <div class="card-title">Training Job Queue <span class="card-action">Manage →</span></div>
+          <div class="job-row">
+            <div class="job-status running"></div>
+            <div class="job-info"><div class="job-name">DrugDiscovery-LLM-v3</div><div class="job-meta">GPT-4 scale · Pfizer dataset · 8× H100</div></div>
+            <div class="job-right"><div class="job-gpu">8× H100</div><div class="job-eta" id="eta1">ETA 4h 12m</div><div class="job-prog-wrap"><div class="job-prog" id="jp1" style="width:62%"></div></div></div>
+          </div>
+          <div class="job-row">
+            <div class="job-status running"></div>
+            <div class="job-info"><div class="job-name">MaterialSci-Transformer</div><div class="job-meta">Protein folding · MIT dataset · 4× H100</div></div>
+            <div class="job-right"><div class="job-gpu">4× H100</div><div class="job-eta">ETA 1h 38m</div><div class="job-prog-wrap"><div class="job-prog" id="jp2" style="width:84%"></div></div></div>
+          </div>
+          <div class="job-row">
+            <div class="job-status running"></div>
+            <div class="job-info"><div class="job-name">ClimateModel-BERT</div><div class="job-meta">Fine-tune · NOAA dataset · 2× H100</div></div>
+            <div class="job-right"><div class="job-gpu">2× H100</div><div class="job-eta">ETA 22m</div><div class="job-prog-wrap"><div class="job-prog" id="jp3" style="width:91%"></div></div></div>
+          </div>
+          <div class="job-row">
+            <div class="job-status queued"></div>
+            <div class="job-info"><div class="job-name">GenomicsFoundation-v1</div><div class="job-meta">Queued · 23andMe dataset · 16× H100</div></div>
+            <div class="job-right"><div class="job-gpu">16× H100</div><div class="job-eta">Starts ~5h</div><div class="job-prog-wrap"><div class="job-prog" style="width:0%;animation:none;background:var(--muted)"></div></div></div>
+          </div>
+          <div class="job-row">
+            <div class="job-status done"></div>
+            <div class="job-info"><div class="job-name">ChemSynth-Encoder</div><div class="job-meta">Completed · 6h 14m ago</div></div>
+            <div class="job-right"><div class="job-gpu muted">4× H100</div><div class="job-eta done-lbl">✓ Done</div><div class="job-prog-wrap"><div class="job-prog" style="width:100%;animation:none;background:var(--muted)"></div></div></div>
+          </div>
+        </div>
+
+        <!-- Cost Estimator -->
+        <div class="card">
+          <div class="card-title">Compute Cost Estimator</div>
+          <div class="cost-row"><span class="cost-lbl">H100 × 8 · 4hrs</span><span class="cost-val">$320.00</span></div>
+          <div class="cost-row"><span class="cost-lbl">H100 × 4 · 2hrs</span><span class="cost-val">$80.00</span></div>
+          <div class="cost-row"><span class="cost-lbl">H100 × 2 · 0.5hrs</span><span class="cost-val">$10.00</span></div>
+          <div class="cost-row"><span class="cost-lbl">Storage (48TB)</span><span class="cost-val">$24.50</span></div>
+          <div class="cost-row"><span class="cost-lbl">Egress (2.1TB)</span><span class="cost-val">$6.30</span></div>
+          <div class="cost-row"><span class="cost-lbl">Orchestration</span><span class="cost-val">$12.00</span></div>
+          <div class="cost-total">
+            <span class="cost-total-lbl">Estimated Total</span>
+            <span class="cost-total-val">$452.80</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="bot-row">
+        <div class="card">
+          <div class="card-title">GPU Throughput — Last 24h <span class="card-action">Export →</span></div>
+          <div class="chart-wrap"><canvas id="throughputChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">VRAM Allocation by Job</div>
+          <div class="mem-row"><div class="mem-label">DrugDiscov.</div><div class="mem-bar"><div class="mem-fill" style="width:62%;background:linear-gradient(90deg,#7c6dfa,#c084fc)"></div></div><div class="mem-val accent2">640GB</div></div>
+          <div class="mem-row"><div class="mem-label">MaterialSci.</div><div class="mem-bar"><div class="mem-fill" style="width:42%;background:linear-gradient(90deg,#10e898,#38b6ff)"></div></div><div class="mem-val green">320GB</div></div>
+          <div class="mem-row"><div class="mem-label">ClimateModel</div><div class="mem-bar"><div class="mem-fill" style="width:21%;background:linear-gradient(90deg,#38b6ff,#7c6dfa)"></div></div><div class="mem-val blue">160GB</div></div>
+          <div class="mem-row"><div class="mem-label">System Rsv.</div><div class="mem-bar"><div class="mem-fill" style="width:11%;background:var(--border2)"></div></div><div class="mem-val muted2">80GB</div></div>
+          <div class="mem-row"><div class="mem-label">Available</div><div class="mem-bar"><div class="mem-fill" style="width:23%;background:rgba(16,232,152,.25)"></div></div><div class="mem-val green">360GB</div></div>
+        </div>
+      </div>
+
+      <!-- Event Log -->
+      <div class="log-card">
+        <div class="log-header">
+          <div class="log-title">Live Event Log</div>
+          <div class="log-live"><div class="log-live-dot"></div>Streaming</div>
+        </div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+
+    </div>
+
+    <!-- Status Bar -->
+    <div class="statusbar">
+      <span><span class="sb-dot sb-green"></span>All systems operational</span>
+      <div class="sb-div"></div>
+      <span id="sb-jobs">12 jobs running · 3 queued</span>
+      <div class="sb-div"></div>
+      <span>Temp: <span id="temp">72°C</span></span>
+      <div class="sb-div"></div>
+      <span>Network: <span id="net">48.2 Gb/s</span></span>
+      <div class="sb-div"></div>
+      <span>TFLOPS: <span id="tflops">742</span></span>
+      <div class="sb-div"></div>
+      <span class="sb-credit">Harell Data · GPU Compute Dashboard · Dhruvin Barot</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
